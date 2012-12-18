@@ -17,7 +17,6 @@
 #define IR_INPUT_PIN_ARRAY 0
 #define IR_CONTROL_PIN_ARRAY 1
 
-
 int ir_pin_array[2][IR_NUM] = {
   {A0, A1, A2, A3, A6, A7}, // analog input pins
   {4, 7, 8, 10, 11, 12} // digital control pins
@@ -40,13 +39,9 @@ int ir_array[3][IR_NUM] = { 0 };
 int motor_array[MOTOR_NUM] = { 0 };
 int servo_array[SERVO_NUM] = { 0 };
 
-
-int buttonPin = 3;
-
 void setup()
 {
   Serial.begin(9600);
-  pinMode(buttonPin, INPUT);
   initIR();
   initMotor();
   initServo();
