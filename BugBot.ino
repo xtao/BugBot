@@ -1,4 +1,9 @@
-
+/*
+ Main Program For BugBot
+ Including IR sensor, Collision sensor, Motor, Servo
+ 
+ Copyright @ InfiniteSense.com
+*/
 
 #define IR_NUM 6
 #define COLLISION_NUM 2
@@ -42,6 +47,9 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(buttonPin, INPUT);
+  initIR();
+  initMotor();
+  initServo();
 }
 
 void loop()
@@ -49,15 +57,74 @@ void loop()
   // ...
 }
 
+void process() {
+
+}
+
+void initIR() {
+  int i;
+  // close light-emitting diodes on IR
+  for (i = 0; i < IR_NUM; i++) {
+    pinMode(ir_pin_array[IR_INPUT_PIN_ARRAY][i], INPUT);
+    pinMode(ir_pin_array[IR_CONTROL_PIN_ARRAY][i], OUTPUT);
+    digitalWrite(ir_pin_array[IR_CONTROL_PIN_ARRAY][i], HIGH);
+  }
+}
+
+void initCollision() {
+  int i;
+  for (i = 0; i < COLLISION_NUM; i++) {
+    //attachInterrupt(i, readCollision, CHANGE);
+  }
+}
+
+void initMotor() {
+  int i;
+  for (i = 0; i < MOTOR_NUM; i++) {
+    pinMode(motor_pin_array[i], OUTPUT); 
+  }
+}
+
+void initServo() {
+  int i;
+  for (i = 0; i < SERVO_NUM; i++) {
+    pinMode(servo_pin_array[i], OUTPUT); 
+  }
+}
+
+// Read IR Values
 int readIR()
 {
   int i;
+  int ir_diff_array[IR_NUM];
+  
+  // read the enviroment value
   for (i = 0; i < IR_NUM; i++) {
+    ir_diff_array[i] = analogRead(ir_pin_array[IR_INPUT_PIN_ARRAY][i]);
+  }
+  
+  // open light-emitting diodes on IR 
+  for (i = 0; i < IR_NUM; i++) {
+    digitalWrite(ir_pin_array[IR_CONTROL_PIN_ARRAY][i], LOW);
+  }
+  
+  // wait...
+  delay(500); // ms
+  
+  // read the diff ir value
+  for (i = 0; i < IR_NUM; i++) {
+    ir_diff_array[i] = analogRead(ir_pin_array[IR_INPUT_PIN_ARRAY][i]) - ir_diff_array[i];
     ir_array[IR_LATEST_ARRAY][i] = ir_array[IR_CURRENT_ARRAY][i];
-    ir_array[IR_CURRENT_ARRAY][i] = analogRead(ir_pin_array[IR_INPUT_PIN_ARRAY][i]);
+    ir_array[IR_CURRENT_ARRAY][i] = ir_diff_array[i];
   }  
+  
+  // close light-emitting diodes on IR
+  for (i = 0; i < IR_NUM; i++) {
+    digitalWrite(ir_pin_array[IR_CONTROL_PIN_ARRAY][i], HIGH);
+  }
 }
 
+// Drive Motors
 int driveMotor()
 {
   int i;
@@ -70,6 +137,7 @@ int readCollision()
 {
 }
 
+// Drive Servos
 int driveServo()
 {
   int i;
