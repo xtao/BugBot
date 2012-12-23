@@ -17,6 +17,7 @@ void setup()
 void loop()
 {
   readIR();
+  delay(500);
 }
 
 void initIR() {
@@ -27,12 +28,16 @@ void initIR() {
 
 void readIR() {
   int ir_diff;
+  int ir_temp;
   ir_diff = analogRead(IR_INPUT_PIN);
   Serial.print(ir_diff);
   digitalWrite(IR_CONTROL_PIN, LOW);
   delay(500);
   Serial.print(" ");
-  ir_diff = analogRead(IR_INPUT_PIN) - ir_diff;
+  ir_temp = analogRead(IR_INPUT_PIN);
+  Serial.print(ir_temp);
+  Serial.print(" ");
+  ir_diff = ir_temp - ir_diff;
   Serial.print(ir_diff);
   digitalWrite(IR_CONTROL_PIN, HIGH);
   Serial.print("\n");
