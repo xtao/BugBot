@@ -10,12 +10,17 @@
 #define MOTOR_NUM 2
 #define SERVO_NUM 1
 
-#define IR_CURRENT_ARRAY 0
-#define IR_LATEST_ARRAY 1
-#define IR_SUM_ARRAY 2
-
 #define IR_INPUT_PIN_ARRAY 0
 #define IR_CONTROL_PIN_ARRAY 1
+
+#define MAX_INT INT16_MAX
+
+#define PID_P_FACTOR 1
+#define PID_I_FACTOR 0
+#define PID_D_FACTOR 0
+
+#define MOTOR_OUTPUT_MAX 1
+#define MOTOR_OUTPUT_MIN 0
 
 int ir_pin_array[2][IR_NUM] = {
   {A0, A1, A2, A3, A6, A7}, // analog input pins
@@ -34,10 +39,31 @@ int servo_pin_array[SERVO_NUM] = {
   9 // digital PWM pins
 };
 
-
-int ir_array[3][IR_NUM] = { 0 };
+int ir_array[IR_NUM] = { 0 };
 int motor_array[MOTOR_NUM] = { 0 };
 int servo_array[SERVO_NUM] = { 0 };
+
+int ir_pos_map[IR_NUM] = {
+    -3, -2, -1, 1, 2, 3
+};
+
+int motor_right_a = 0;
+int motor_right_b = 0;
+int motor_left_a = 0;
+int motor_left_b = 0;
+
+struct pid_t {
+  int p_factor;
+  int i_factor;
+  int d_factor;
+};
+
+pid_t pid = {
+  PID_P_FACTOR,
+  PID_I_FACTOR,
+  PID_D_FACTOR
+};
+
 
 void setup()
 {
@@ -53,7 +79,7 @@ void loop()
 }
 
 void process() {
-
+  
 }
 
 void initIR() {
@@ -109,8 +135,7 @@ int readIR()
   // read the diff ir value
   for (i = 0; i < IR_NUM; i++) {
     ir_diff_array[i] = analogRead(ir_pin_array[IR_INPUT_PIN_ARRAY][i]) - ir_diff_array[i];
-    ir_array[IR_LATEST_ARRAY][i] = ir_array[IR_CURRENT_ARRAY][i];
-    ir_array[IR_CURRENT_ARRAY][i] = ir_diff_array[i];
+    ir_array[i] = ir_diff_array[i];
   }  
   
   // close light-emitting diodes on IR
@@ -122,6 +147,14 @@ int readIR()
 // Drive Motors
 int driveMotor()
 {
+  int y = 0;
+  int x = 0;
+  y = motor_right_a * x + motor_right_b;
+  y = (y > MOTOR_OUTPUT_MAX) ? MOTOR_OUTPUT_MAX : y ;
+  y = (y < MOTOR_OUTPUT_MIN) ? MOTOR_OUTPUT_MIN : y ;
+  y = motor_left_a * x + motor_left_b;
+  y = (y > MOTOR_OUTPUT_MAX) ? MOTOR_OUTPUT_MAX : y ;
+  y = (y < MOTOR_OUTPUT_MIN) ? MOTOR_OUTPUT_MIN : y ;
   int i;
   for (i = 0; i < MOTOR_NUM; i++) {
     analogWrite(motor_pin_array[i], motor_array[i]);
@@ -139,4 +172,9 @@ int driveServo()
   for (i = 0; i < SERVO_NUM; i++) {
     analogWrite(servo_pin_array[i], servo_array[i]);
   }
+}
+
+int processPID(int setPoint, int processValue)
+{
+  
 }
