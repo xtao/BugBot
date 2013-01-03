@@ -56,6 +56,8 @@ struct pid_t {
   int p_factor;
   int i_factor;
   int d_factor;
+  int sum_error;
+  int last_error;
 };
 
 pid_t pid = {
@@ -155,6 +157,7 @@ int driveMotor()
   y = motor_left_a * x + motor_left_b;
   y = (y > MOTOR_OUTPUT_MAX) ? MOTOR_OUTPUT_MAX : y ;
   y = (y < MOTOR_OUTPUT_MIN) ? MOTOR_OUTPUT_MIN : y ;
+
   int i;
   for (i = 0; i < MOTOR_NUM; i++) {
     analogWrite(motor_pin_array[i], motor_array[i]);
@@ -174,7 +177,19 @@ int driveServo()
   }
 }
 
-int processPID(int setPoint, int processValue)
+int processPID(int setPoint, int processValue, struct pid_t *pid)
 {
-  
+    int error = 0;
+    int p_term;
+    int i_term;
+    int d_term;
+    int ret;
+    error = setPoint - processValue;
+    p_term = pid->p_factor * error;
+    pid->sum_error = pid->sum_error + error;
+    i_term = pid->i_factor * pid->sum_error;
+    d_term = pid->d_factor * (pid->last_error - error);
+    pid->last_error = error;
+    ret = p_term + i_term + d_term;
+    return ret;
 }
