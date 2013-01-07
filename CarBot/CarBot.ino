@@ -29,16 +29,16 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 1
+#define PID_P_FACTOR 0.9
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 0
+#define PID_D_FACTOR 0.1
 
 struct pid_t {
-  int p_factor;
-  int i_factor;
-  int d_factor;
-  int sum_error;
-  int last_error;
+  float p_factor;
+  float i_factor;
+  float d_factor;
+  float sum_error;
+  float last_error;
 };
 
 struct pid_t pid = {
@@ -48,14 +48,6 @@ struct pid_t pid = {
   0,
   0
 };
-
-// sensor
-const int left1 = PIN_IR1_LEFT;
-const int left2 = PIN_IR2_LEFT;
-const int left3 = PIN_IR3_LEFT;
-const int right3 = PIN_IR3_RIGHT;
-const int right2 = PIN_IR2_RIGHT;
-const int right1 = PIN_IR1_RIGHT;
 
 int ir_array[IR_NUM] = { 0 };
 const int ir_pin_array[IR_NUM] = {
@@ -99,7 +91,7 @@ int process()
   // get result
   
   int i;
-  int ret = 0;
+  float ret = 0;
   int ir_active_num = 0;
   int ir_active = -1;
   for (i = 0; i < IR_NUM; i++) {
@@ -153,13 +145,13 @@ int readIR()
 
 /* PID */
 
-int processPID(int setPoint, int processValue, struct pid_t *pid)
+float processPID(int setPoint, int processValue, struct pid_t *pid)
 {
-    int error = 0;
-    int p_term = 0;
-    int i_term = 0;
-    int d_term = 0;
-    int ret = 0;
+    float error = 0;
+    float p_term = 0;
+    float i_term = 0;
+    float d_term = 0;
+    float ret = 0;
     error = setPoint - processValue;
     p_term = pid->p_factor * error;
     //pid->sum_error = pid->sum_error + error;
