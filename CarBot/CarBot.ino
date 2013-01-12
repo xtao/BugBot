@@ -32,19 +32,20 @@
 #define PID_P_FACTOR 0.9
 #define PID_I_FACTOR 0
 #define PID_D_FACTOR 0.1
+#define PID_SCALING_FACTOR 128
 
 struct pid_t {
-  float p_factor;
-  float i_factor;
-  float d_factor;
-  float sum_error;
-  float last_error;
+  int p_factor;
+  int i_factor;
+  int d_factor;
+  int sum_error;
+  int last_error;
 };
 
 struct pid_t pid = {
-  PID_P_FACTOR,
-  PID_I_FACTOR,
-  PID_D_FACTOR,
+  PID_P_FACTOR * PID_SCALING_FACTOR,
+  PID_I_FACTOR * PID_SCALING_FACTOR,
+  PID_D_FACTOR * PID_SCALING_FACTOR,
   0,
   0
 };
@@ -54,7 +55,7 @@ const int ir_pin_array[IR_NUM] = {
    PIN_IR1_LEFT, PIN_IR2_LEFT, PIN_IR3_LEFT, PIN_IR3_RIGHT, PIN_IR2_RIGHT, PIN_IR1_RIGHT
 };
 const int ir_pos_map[IR_NUM] = {
-    -3, -2, -1, 1, 2, 3
+    -5, -3, -1, 1, 3, 5
 };
 
 int motor_array[3][MOTOR_NUM] = { 0 };
@@ -91,18 +92,24 @@ int process()
   // get result
   
   int i;
-  float ret = 0;
+  int ret = 0;
   int ir_active_num = 0;
   int ir_active = -1;
   for (i = 0; i < IR_NUM; i++) {
-    if (ir_array[i] == LOW) {
+    int ir;
+    //ir = i; // left most
+    ir = (i + 2) % IR_NUM; // 8
+    //ir = (i + IR_NUM - 1) % IR_NUM; // right most
+    if (ir_array[ir] == LOW) {
       ir_active_num++;
-      ir_active = (ir_active == -1) ? i : ir_active;
+      ir_active = (ir_active == -1) ? ir : ir_active;
     }
   }
   
   if (ir_active_num > 0) {
     ret = processPID(0, ir_pos_map[ir_active], &pid);
+    runByPosition(ret, 2);
+    /*
     if (ret > 3) {
       runLeft(180, 2);
     } else if (ret <= 3 && ret > 2) {
@@ -118,8 +125,7 @@ int process()
     } else if (ret < -3 ) {
       runRight(180, 2);
     }
-  } else {
-    runForward(150, 2000000);
+    */
   }
 }
 
@@ -145,20 +151,20 @@ int readIR()
 
 /* PID */
 
-float processPID(int setPoint, int processValue, struct pid_t *pid)
+int processPID(int setPoint, int processValue, struct pid_t *pid)
 {
-    float error = 0;
-    float p_term = 0;
-    float i_term = 0;
-    float d_term = 0;
-    float ret = 0;
+    int error = 0;
+    int p_term = 0;
+    int i_term = 0;
+    int d_term = 0;
+    int ret = 0;
     error = setPoint - processValue;
     p_term = pid->p_factor * error;
     //pid->sum_error = pid->sum_error + error;
     //i_term = pid->i_factor * pid->sum_error;
     d_term = pid->d_factor * (pid->last_error - error);
     pid->last_error = error;
-    ret = p_term + i_term + d_term;
+    ret = (p_term + i_term + d_term) / PID_SCALING_FACTOR;
     /* TODO: check value range */
     return ret;
 }
@@ -199,6 +205,27 @@ void runRight(int speed, int delay)
 {
   motorForward(MOTOR_LEFT, speed);
   motorBackward(MOTOR_RIGHT, speed);
+  motor_delay = delay;
+}
+
+void runByPosition(int position, int delay)
+{
+  if (position < -5) {
+    motorForward(MOTOR_LEFT, 150);
+    motorBackward(MOTOR_RIGHT, 150);
+  } else if (position >= -5 && position < -1) {
+    motorForward(MOTOR_LEFT, 120);
+    motorForward(MOTOR_RIGHT, 60 * position + 150);
+  } else if (position >= -1 && position <= 1) {
+    motorForward(MOTOR_LEFT, 120);
+    motorForward(MOTOR_RIGHT, 120);
+  } else if (position > 1 && position <= 5) {
+    motorForward(MOTOR_LEFT, -60 * position + 150);
+    motorForward(MOTOR_RIGHT, 120);
+  } else if (position > 5) {
+    motorBackward(MOTOR_LEFT, 150);
+    motorForward(MOTOR_RIGHT, 150);
+  }
   motor_delay = delay;
 }
 
