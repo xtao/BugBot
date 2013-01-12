@@ -29,7 +29,7 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 0.9
+#define PID_P_FACTOR 1
 #define PID_I_FACTOR 0
 #define PID_D_FACTOR 0.1
 #define PID_SCALING_FACTOR 128
@@ -211,20 +211,20 @@ void runRight(int speed, int delay)
 void runByPosition(int position, int delay)
 {
   if (position < -5) {
-    motorForward(MOTOR_LEFT, 150);
-    motorBackward(MOTOR_RIGHT, 150);
+    motorForward(MOTOR_LEFT, 180);
+    motorBackward(MOTOR_RIGHT, 180);
   } else if (position >= -5 && position < -1) {
     motorForward(MOTOR_LEFT, 120);
-    motorForward(MOTOR_RIGHT, 60 * position + 150);
+    motorForward(MOTOR_RIGHT, 30 * position + 150);
   } else if (position >= -1 && position <= 1) {
     motorForward(MOTOR_LEFT, 120);
     motorForward(MOTOR_RIGHT, 120);
   } else if (position > 1 && position <= 5) {
-    motorForward(MOTOR_LEFT, -60 * position + 150);
+    motorForward(MOTOR_LEFT, -30 * position + 150);
     motorForward(MOTOR_RIGHT, 120);
   } else if (position > 5) {
-    motorBackward(MOTOR_LEFT, 150);
-    motorForward(MOTOR_RIGHT, 150);
+    motorBackward(MOTOR_LEFT, 180);
+    motorForward(MOTOR_RIGHT, 180);
   }
   motor_delay = delay;
 }
