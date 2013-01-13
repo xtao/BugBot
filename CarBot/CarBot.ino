@@ -94,7 +94,10 @@ int process()
   int i;
   int ret = 0;
   int ir_active_num = 0;
+  int ir_pos_sum = 0;
   int ir_active = -1;
+  int ir_active_left = -1;
+  int ir_active_right = -1;
   for (i = 0; i < IR_NUM; i++) {
     int ir;
     //ir = i; // left most
@@ -103,11 +106,12 @@ int process()
     if (ir_array[ir] == LOW) {
       ir_active_num++;
       ir_active = (ir_active == -1) ? ir : ir_active;
+      ir_pos_sum += ir_pos_map[ir];
     }
   }
   
   if (ir_active_num > 0) {
-    ret = processPID(0, ir_pos_map[ir_active], &pid);
+    ret = processPID(0, ir_pos_sum / ir_active_num, &pid);
     runByPosition(ret, 2);
     /*
     if (ret > 3) {
@@ -212,18 +216,18 @@ void runByPosition(int position, int delay)
 {
   if (position < -5) {
     motorForward(MOTOR_LEFT, 180);
-    motorBackward(MOTOR_RIGHT, 180);
-  } else if (position >= -5 && position < -1) {
-    motorForward(MOTOR_LEFT, 120);
+    motorForward(MOTOR_RIGHT, 0);
+  } else if (position >= -5 && position < -2) {
+    motorForward(MOTOR_LEFT, 150); 
     motorForward(MOTOR_RIGHT, 30 * position + 150);
-  } else if (position >= -1 && position <= 1) {
-    motorForward(MOTOR_LEFT, 120);
-    motorForward(MOTOR_RIGHT, 120);
-  } else if (position > 1 && position <= 5) {
+  } else if (position >= -2 && position <= 2) {
+    motorForward(MOTOR_LEFT, 150);
+    motorForward(MOTOR_RIGHT, 150);
+  } else if (position > 2 && position <= 5) {
     motorForward(MOTOR_LEFT, -30 * position + 150);
-    motorForward(MOTOR_RIGHT, 120);
+    motorForward(MOTOR_RIGHT, 150);
   } else if (position > 5) {
-    motorBackward(MOTOR_LEFT, 180);
+    motorForward(MOTOR_LEFT, 0);
     motorForward(MOTOR_RIGHT, 180);
   }
   motor_delay = delay;
@@ -269,3 +273,4 @@ int driveMotor()
   }
   delayMicroseconds(motor_delay);
 }
+
