@@ -29,9 +29,9 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 3
+#define PID_P_FACTOR 2.6
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 0
+#define PID_D_FACTOR 0.4
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
@@ -111,7 +111,7 @@ int process()
   }
   
   if (ir_active_num > 0) {
-    ret = processPID(0, ir_pos_sum / ir_active_num, &pid);
+    ret = processPID(0, ir_pos_map[ir_active], &pid);
     runByPosition(ret, 2);
     /*
     if (ret > 3) {
