@@ -21,6 +21,12 @@
 #define PIN_IR2_RIGHT A4
 #define PIN_IR1_RIGHT A5
 
+/* collision */
+#define PIN_COLLISION_IR 3
+
+/* servo */
+#define PIN_SERVO 2
+
 #define IR_NUM 6
 #define MOTOR_NUM 2
 #define MOTOR_PWM 0
@@ -50,6 +56,7 @@ struct pid_t pid = {
   0
 };
 
+int collision_ir = 0;
 int ir_array[IR_NUM] = { 0 };
 const int ir_pin_array[IR_NUM] = {
    PIN_IR1_LEFT, PIN_IR2_LEFT, PIN_IR3_LEFT, PIN_IR3_RIGHT, PIN_IR2_RIGHT, PIN_IR1_RIGHT
@@ -85,7 +92,7 @@ void initSerial()
   Serial.begin(9600);
 }
 
-int process()
+void process()
 {
   // get the position
   // process with PID
@@ -98,6 +105,12 @@ int process()
   int ir_active = -1;
   int ir_active_left = -1;
   int ir_active_right = -1;
+  
+  if (collision_ir == LOW) {
+    stopDead(1000);
+    return;
+  }
+  
   for (i = 0; i < IR_NUM; i++) {
     int ir;
     //ir = i; // left most
@@ -151,6 +164,7 @@ int readIR()
   for (i = 0; i < IR_NUM; i++) {
      ir_array[i] = digitalRead(ir_pin_array[i]);
   }
+  collision_ir = digitalRead(PIN_COLLISION_IR);
 }
 
 /* PID */
@@ -209,6 +223,13 @@ void runRight(int speed, int delay)
 {
   motorForward(MOTOR_LEFT, speed);
   motorBackward(MOTOR_RIGHT, speed);
+  motor_delay = delay;
+}
+
+void stopDead(int delay)
+{
+  motorStop(MOTOR_LEFT);
+  motorStop(MOTOR_RIGHT);
   motor_delay = delay;
 }
 

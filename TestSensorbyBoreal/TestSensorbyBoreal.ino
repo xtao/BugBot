@@ -1,15 +1,17 @@
 int left1 = A0;
-int left2 = 1;
-int left3 = 2;
-int right3 = 3;
-int right2 = 4;
-int right1 = 5;
+int left2 = A1;
+int left3 = A2;
+int right3 = A3;
+int right2 = A4;
+int right1 = A5;
+
+int ir_pin = 3;
+int ir_en_pin = 0;
 
 void setup()
 {
   Serial.begin(9600);
 
-  
   pinMode(left1, INPUT);
   pinMode(left2, INPUT);
   pinMode(left3, INPUT);
@@ -17,18 +19,24 @@ void setup()
   pinMode(right2, INPUT);
   pinMode(right1, INPUT);
   
+  pinMode(ir_pin, INPUT);
 }
 
 void loop() 
 { 
-  int num1,num2,num3,num4,num5,num6;
+  int num1,num2,num3,num4,num5,num6,num7;
   num1=digitalRead(left1);   
   num2=digitalRead(left2);
   num3=digitalRead(left3);
   num4=digitalRead(right3);
   num5=digitalRead(right2);
   num6=digitalRead(right1);
+  num7=digitalRead(ir_pin);
   
+  if (num7 == LOW) {
+    Serial.println("Obstruction");
+    delayMicroseconds(2);
+  }
   
   if(num1==0)          // Left1
   {
@@ -66,4 +74,5 @@ else if(num5==0)       //Right2
     Serial.println("trunfoward180");
    delayMicroseconds(1000);
   }
+  
 }
