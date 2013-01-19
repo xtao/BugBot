@@ -29,9 +29,9 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 2.65
+#define PID_P_FACTOR 4
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 0.65
+#define PID_D_FACTOR 2
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
@@ -215,20 +215,20 @@ void runRight(int speed, int delay)
 void runByPosition(int position, int delay)
 {
   if (position < -5) {
-    motorForward(MOTOR_LEFT, 150);
-    motorForward(MOTOR_RIGHT, 0);
+    motorForward(MOTOR_LEFT, 170);
+    motorForward(MOTOR_RIGHT, 10);
   } else if (position >= -5 && position < -1) {
-    motorForward(MOTOR_LEFT, 150); 
-    motorForward(MOTOR_RIGHT, 30 * position + 150);
+    motorForward(MOTOR_LEFT, 170); 
+    motorForward(MOTOR_RIGHT, 40 * position + 210);
   } else if (position >= -1 && position <= 1) {
-    motorForward(MOTOR_LEFT, 150);
-    motorForward(MOTOR_RIGHT, 150);
+    motorForward(MOTOR_LEFT, 170);
+    motorForward(MOTOR_RIGHT, 170);
   } else if (position > 1 && position <= 5) {
-    motorForward(MOTOR_LEFT, -30 * position + 150);
-    motorForward(MOTOR_RIGHT, 150);
+    motorForward(MOTOR_LEFT, -40 * position + 210);
+    motorForward(MOTOR_RIGHT, 170);
   } else if (position > 5) {
-    motorForward(MOTOR_LEFT, 0);
-    motorForward(MOTOR_RIGHT, 150);
+    motorForward(MOTOR_LEFT, 10);
+    motorForward(MOTOR_RIGHT, 170);
   }
   motor_delay = delay;
 }
