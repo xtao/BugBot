@@ -31,7 +31,7 @@
 
 #define PID_P_FACTOR 2.6
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 0.4
+#define PID_D_FACTOR 0.6
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
@@ -112,7 +112,7 @@ int process()
   
   if (ir_active_num > 0) {
     ret = processPID(0, ir_pos_map[ir_active], &pid);
-    runByPosition(ret, 2);
+    runByPosition(ret, 1);
     /*
     if (ret > 3) {
       runLeft(180, 2);
@@ -215,7 +215,7 @@ void runRight(int speed, int delay)
 void runByPosition(int position, int delay)
 {
   if (position < -5) {
-    motorForward(MOTOR_LEFT, 180);
+    motorForward(MOTOR_LEFT, 150);
     motorForward(MOTOR_RIGHT, 0);
   } else if (position >= -5 && position < -1) {
     motorForward(MOTOR_LEFT, 150); 
@@ -228,7 +228,7 @@ void runByPosition(int position, int delay)
     motorForward(MOTOR_RIGHT, 150);
   } else if (position > 5) {
     motorForward(MOTOR_LEFT, 0);
-    motorForward(MOTOR_RIGHT, 180);
+    motorForward(MOTOR_RIGHT, 150);
   }
   motor_delay = delay;
 }
