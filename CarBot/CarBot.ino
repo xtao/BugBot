@@ -29,9 +29,9 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 4
+#define PID_P_FACTOR 4.1
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 2
+#define PID_D_FACTOR 5
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
