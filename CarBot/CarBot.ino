@@ -5,7 +5,7 @@
  Copyright @ InfiniteSense.com
 */
 
-/* pwm port 3,5,6, 9, 10, 11 */
+/* pwm port 3, 5, 6, 9, 10, 11 */
 #define PIN_PWM_LEFT 11
 #define PIN_DIR1_LEFT 10
 #define PIN_DIR2_LEFT 9
@@ -37,7 +37,7 @@
 
 #define PID_P_FACTOR 4.1
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 5
+#define PID_D_FACTOR 1
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
@@ -106,10 +106,12 @@ void process()
   int ir_active_left = -1;
   int ir_active_right = -1;
   
+  /*
   if (collision_ir == LOW) {
     stopDead(1000);
     return;
   }
+  */
   
   for (i = 0; i < IR_NUM; i++) {
     int ir;
@@ -236,20 +238,20 @@ void stopDead(int delay)
 void runByPosition(int position, int delay)
 {
   if (position < -5) {
-    motorForward(MOTOR_LEFT, 170);
-    motorForward(MOTOR_RIGHT, 10);
+    motorForward(MOTOR_LEFT, 120);
+    motorForward(MOTOR_RIGHT, 20);
   } else if (position >= -5 && position < -1) {
-    motorForward(MOTOR_LEFT, 170); 
-    motorForward(MOTOR_RIGHT, 40 * position + 210);
+    motorForward(MOTOR_LEFT, 120); 
+    motorForward(MOTOR_RIGHT, 25 * position + 145);
   } else if (position >= -1 && position <= 1) {
-    motorForward(MOTOR_LEFT, 170);
-    motorForward(MOTOR_RIGHT, 170);
+    motorForward(MOTOR_LEFT, 120);
+    motorForward(MOTOR_RIGHT, 120);
   } else if (position > 1 && position <= 5) {
-    motorForward(MOTOR_LEFT, -40 * position + 210);
-    motorForward(MOTOR_RIGHT, 170);
+    motorForward(MOTOR_LEFT, -25 * position + 145);
+    motorForward(MOTOR_RIGHT, 120);
   } else if (position > 5) {
-    motorForward(MOTOR_LEFT, 10);
-    motorForward(MOTOR_RIGHT, 170);
+    motorForward(MOTOR_LEFT, 20);
+    motorForward(MOTOR_RIGHT, 120);
   }
   motor_delay = delay;
 }
