@@ -35,9 +35,9 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define PID_P_FACTOR 4.1
+#define PID_P_FACTOR 5.9
 #define PID_I_FACTOR 0
-#define PID_D_FACTOR 1
+#define PID_D_FACTOR 0
 #define PID_SCALING_FACTOR 128
 
 struct pid_t {
@@ -115,8 +115,8 @@ void process()
   
   for (i = 0; i < IR_NUM; i++) {
     int ir;
-    //ir = i; // left most
-    ir = (i + 2) % IR_NUM; // 8
+    ir = i; // left most
+    //ir = (i + 2) % IR_NUM; // 8
     //ir = (i + IR_NUM - 1) % IR_NUM; // right most
     if (ir_array[ir] == LOW) {
       ir_active_num++;
@@ -126,8 +126,14 @@ void process()
   }
   
   if (ir_active_num > 0) {
-    ret = processPID(0, ir_pos_map[ir_active], &pid);
-    runByPosition(ret, 1);
+    if (ir_active_num == 6) {
+      ret = processPID(0, ir_pos_map[0], &pid);
+      runByPosition(ret, 10000);
+    } else {
+      ret = processPID(0, ir_pos_map[ir_active], &pid);
+      runByPosition(ret, 100);
+    }
+    
     /*
     if (ret > 3) {
       runLeft(180, 2);
