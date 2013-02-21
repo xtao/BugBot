@@ -4,6 +4,7 @@
  
  Copyright @ InfiniteSense.com
 */
+#include <Servo.h> 
 
 /* pwm port 3, 5, 6, 9, 10, 11 */
 #define PIN_PWM_LEFT 11
@@ -28,6 +29,7 @@
 #define PIN_SERVO 2
 
 #define IR_NUM 6
+#define IR_NUM_MAX 6
 #define MOTOR_NUM 2
 #define MOTOR_PWM 0
 #define MOTOR_DIR1 1
@@ -39,6 +41,9 @@
 #define PID_I_FACTOR 0
 #define PID_D_FACTOR 0
 #define PID_SCALING_FACTOR 128
+
+#define DIRECTION_TO_HOME 1
+#define DIRECTION_TO_TOWER 0
 
 struct pid_t {
   int p_factor;
@@ -58,10 +63,10 @@ struct pid_t pid = {
 
 int collision_ir = 0;
 int ir_array[IR_NUM] = { 0 };
-const int ir_pin_array[IR_NUM] = {
+const int ir_pin_array[IR_NUM_MAX] = {
    PIN_IR1_LEFT, PIN_IR2_LEFT, PIN_IR3_LEFT, PIN_IR3_RIGHT, PIN_IR2_RIGHT, PIN_IR1_RIGHT
 };
-const int ir_pos_map[IR_NUM] = {
+const int ir_pos_map[IR_NUM_MAX] = {
     -5, -3, -1, 1, 3, 5
 };
 
@@ -73,11 +78,16 @@ const int motor_pin_array[3][MOTOR_NUM] = {
   {PIN_DIR2_LEFT, PIN_DIR2_RIGHT}
 };
 
+int car_direction = DIRECTION_TO_TOWER;
+Servo myservo;
+
 void setup()
 {
   initSerial();
   initMotor();
   initIR();
+  initServo();
+  delay(1000);
 }
 
 void loop() 
@@ -106,18 +116,33 @@ void process()
   int ir_active_left = -1;
   int ir_active_right = -1;
   
-  /*
+  
   if (collision_ir == LOW) {
-    stopDead(1000);
+    if (car_direction == DIRECTION_TO_TOWER) {
+      car_direction = DIRECTION_TO_HOME;
+      stopDead(1000);
+      driveMotor();
+      delay(1000);
+      myservo.write(45);
+      delay(1000);
+      findLine(180);
+      for (i = 0; i < 6000; i++) {
+        driveMotor();
+      }
+    } else {
+      stopDead(1000);
+    }
     return;
   }
-  */
   
   for (i = 0; i < IR_NUM; i++) {
     int ir;
-    ir = i; // left most
+    if (car_direction == DIRECTION_TO_TOWER) {
+      ir = i; // left most
+    } else {
+      ir = (i + IR_NUM - 1) % IR_NUM; // right most
+    }
     //ir = (i + 2) % IR_NUM; // 8
-    //ir = (i + IR_NUM - 1) % IR_NUM; // right most
     if (ir_array[ir] == LOW) {
       ir_active_num++;
       ir_active = (ir_active == -1) ? ir : ir_active;
@@ -126,9 +151,8 @@ void process()
   }
   
   if (ir_active_num > 0) {
-    if (ir_active_num == 6) {
-      ret = processPID(0, ir_pos_map[0], &pid);
-      runByPosition(ret, 10000);
+    if (ir_active_num == IR_NUM) {
+      findLine(100);
     } else {
       ret = processPID(0, ir_pos_map[ir_active], &pid);
       runByPosition(ret, 100);
@@ -151,6 +175,9 @@ void process()
       runRight(180, 2);
     }
     */
+  } else {
+    // cannot find line
+    findLine(100);
   }
 }
 
@@ -161,9 +188,11 @@ void initIR()
 {
   int i;
   // setting input pins
-  for (i = 0; i < IR_NUM; i++) {
+  for (i = 0; i < IR_NUM_MAX; i++) {
     pinMode(ir_pin_array[i], INPUT);
   }
+  
+  pinMode(PIN_COLLISION_IR, INPUT);
 }
 
 int readIR()
@@ -193,6 +222,17 @@ int processPID(int setPoint, int processValue, struct pid_t *pid)
     ret = (p_term + i_term + d_term) / PID_SCALING_FACTOR;
     /* TODO: check value range */
     return ret;
+}
+
+void findLine(int speed)
+{
+  runLeft(speed, 1);
+}
+
+void initServo()
+{
+  myservo.attach(PIN_SERVO);
+  myservo.write(90);
 }
 
 /* MOTOR */
