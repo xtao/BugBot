@@ -111,65 +111,27 @@ void process()
   // get result
   int i;
   
-  if (collision_ir == LOW) {
-    if (car_direction == STATE_TO_TOWER) {
-      car_direction = STATE_FINDING_LINE;
-      stopDead(1000);
-      driveMotor();
-      delay(1000);
-      myservo.write(45);
-      delay(1000);
-      runLeft(180, 2);
-      for (i = 0; i < 6000; i++) {
-        driveMotor();
-      }
-    } else if (car_direction == STATE_TO_HOME) {
-      stopDead(1000);
-    }
-    return;
-  }
-  
-  if (car_direction == STATE_TO_TOWER) {
     // ir 5
     if (ir_array[0] == LOW && ir_array[2] == LOW) {
       runLeft(150, 2);
     } else if (ir_array[1] == LOW && ir_array[2] == LOW) {
       runLeft(120, 2);
     } else if (ir_array[2] == LOW) {
-      runForward(150, 2);
-    } else if (ir_array[1] == LOW) { 
-      runLeft(120, 2);
-    } else if (ir_array[3] == LOW) {
-      runRight(120, 2);
-    } else if (ir_array[0] == LOW) {
-      runLeft(150 ,2);
-    } else if (ir_array[4] == LOW) {
-      runRight(150, 2);
-    }
-  } else if (car_direction == STATE_TO_HOME) {
-    // ir 5
-    if (ir_array[4] == LOW && ir_array[2] == LOW) {
-      runRight(150, 2);
-    } else if (ir_array[3] == LOW && ir_array[2] == LOW) {
-      runRight(120, 2);
-    } else if (ir_array[2] == LOW) {
-      runForward(150, 2);
+      runByPosition(0, 2);
+      //runForward(150, 2);
     } else if (ir_array[1] == LOW) {
-      runLeft(120, 2);
+      runByPosition(4, 2);
+      //runLeft(120, 2);
     } else if (ir_array[3] == LOW) {
-      runRight(120, 2);
+      runByPosition(-4, 2);
+      //runRight(120, 2);
     } else if (ir_array[0] == LOW) {
-      runLeft(150 ,2);
+      runByPosition(6, 2);
+      //runLeft(150 ,2);
     } else if (ir_array[4] == LOW) {
-      runRight(150, 2);
+      runByPosition(-6, 2);
+      //runRight(150, 2);
     }
-  } else if (car_direction == STATE_FINDING_LINE) {
-    if (ir_array[0] == HIGH && ir_array[1] == HIGH && ir_array[2] == HIGH && ir_array[3] == HIGH && ir_array[4] == HIGH) {
-      runLeft(120, 2);
-    } else {
-      car_direction = STATE_TO_HOME;
-    }
-  }
 }
 
 
@@ -275,20 +237,20 @@ void stopDead(int delay)
 void runByPosition(int position, int delay)
 {
   if (position < -5) {
-    motorForward(MOTOR_LEFT, 120);
-    motorForward(MOTOR_RIGHT, 20);
+    motorForward(MOTOR_LEFT, 150);
+    motorForward(MOTOR_RIGHT, 0);
   } else if (position >= -5 && position < -1) {
-    motorForward(MOTOR_LEFT, 120); 
-    motorForward(MOTOR_RIGHT, 25 * position + 145);
+    motorForward(MOTOR_LEFT, 150); 
+    motorForward(MOTOR_RIGHT, 30 * position + 180);
   } else if (position >= -1 && position <= 1) {
     motorForward(MOTOR_LEFT, 120);
     motorForward(MOTOR_RIGHT, 120);
   } else if (position > 1 && position <= 5) {
-    motorForward(MOTOR_LEFT, -25 * position + 145);
-    motorForward(MOTOR_RIGHT, 120);
+    motorForward(MOTOR_LEFT, -30 * position + 180);
+    motorForward(MOTOR_RIGHT, 150);
   } else if (position > 5) {
-    motorForward(MOTOR_LEFT, 20);
-    motorForward(MOTOR_RIGHT, 120);
+    motorForward(MOTOR_LEFT, 0);
+    motorForward(MOTOR_RIGHT, 150);
   }
   motor_delay = delay;
 }
