@@ -110,46 +110,15 @@ void process()
   // process with PID
   // get result
   int i;
-  
-  if (collision_ir == LOW) {
-    if (car_direction == STATE_TO_TOWER) {
-      car_direction = STATE_FINDING_LINE;
-      stopDead(1);
-      driveMotor();
-      delay(1000);
-      myservo.write(45);
-      delay(1000);
-      runLeft(180, 2);
+
+    // ir 5
+    if (ir_array[4] == LOW && ir_array[3] == LOW && ir_array[2] == LOW) {
+      runRight(180, 2);
+      // specific process
       for (i = 0; i < 6000; i++) {
         driveMotor();
       }
-    } else if (car_direction == STATE_TO_HOME) {
-      stopDead(1);
-      driveMotor();
-    }
-    return;
-  }
-  
-  if (car_direction == STATE_TO_TOWER) {
-    // ir 5
-    if (ir_array[0] == LOW && ir_array[2] == LOW) {
-      runLeft(180, 2);
-    } else if (ir_array[1] == LOW && ir_array[2] == LOW) {
-      runLeft(150, 2);
-    } else if (ir_array[2] == LOW) {
-      runByPosition(0, 2);
-    } else if (ir_array[1] == LOW) { 
-      runByPosition(4, 2);
-    } else if (ir_array[3] == LOW) {
-      runByPosition(-4, 2);
-    } else if (ir_array[0] == LOW) {
-      runByPosition(6, 2);
-    } else if (ir_array[4] == LOW) {
-      runByPosition(-6, 2);
-    }
-  } else if (car_direction == STATE_TO_HOME) {
-    // ir 5
-    if (ir_array[4] == LOW && ir_array[2] == LOW) {
+    } else if (ir_array[4] == LOW && ir_array[2] == LOW) {
       runRight(180, 2);
     } else if (ir_array[3] == LOW && ir_array[2] == LOW) {
       runRight(150, 2);
@@ -164,13 +133,7 @@ void process()
     } else if (ir_array[4] == LOW) {
       runByPosition(-6, 2);
     }
-  } else if (car_direction == STATE_FINDING_LINE) {
-    if (ir_array[0] == HIGH && ir_array[1] == HIGH && ir_array[2] == HIGH && ir_array[3] == HIGH && ir_array[4] == HIGH) {
-      runLeft(120, 2);
-    } else {
-      car_direction = STATE_TO_HOME;
-    }
-  }
+
 }
 
 
