@@ -342,4 +342,3 @@ int driveMotor()
   }
   delayMicroseconds(motor_delay);
 }
-

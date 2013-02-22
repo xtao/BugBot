@@ -110,18 +110,17 @@ void process()
   
   // ir 5
   if (ir_array[2] == LOW) {
-    runForward(150, 2);
-  } else if (ir_array[1] == LOW) {
-    runRight(120, 2);
-  } else if (ir_array[3] == LOW) {
+    runForward(150, 200);
+  } else if (ir_array[1] == LOW) { 
     runLeft(120, 2);
+  } else if (ir_array[3] == LOW) {
+    runRight(120, 2);
   } else if (ir_array[0] == LOW) {
-    runRight(150 ,2);
+    runLeft(150 ,2);
   } else if (ir_array[4] == LOW) {
-    runLeft(150, 2);
+    runRight(150, 2);
   } else if (ir_array[0] == HIGH && ir_array[1] == HIGH && ir_array[2] == HIGH && ir_array[3] == HIGH && ir_array[4] == HIGH) {
   }
-  
 }
 
 
