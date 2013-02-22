@@ -157,24 +157,6 @@ void process()
       ret = processPID(0, ir_pos_map[ir_active], &pid);
       runByPosition(ret, 100);
     }
-    
-    /*
-    if (ret > 3) {
-      runLeft(180, 2);
-    } else if (ret <= 3 && ret > 2) {
-      runLeft(150, 2);
-    } else if (ret <= 2 && ret > 1) {
-      runLeft(120, 2);
-    } else if (ret <= 1 && ret > -1) {
-      runForward(150, 2);
-    } else if (ret <= -1 && ret > -2) {
-      runRight(120, 2);
-    } else if (ret <= -2 && ret >= -3) {
-      runRight(150 ,2);
-    } else if (ret < -3 ) {
-      runRight(180, 2);
-    }
-    */
   } else {
     // cannot find line
     findLine(100);

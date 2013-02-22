@@ -42,8 +42,10 @@
 #define PID_D_FACTOR 0
 #define PID_SCALING_FACTOR 128
 
-#define DIRECTION_TO_HOME 1
-#define DIRECTION_TO_TOWER 0
+#define STATE_TO_TOWER 0
+#define STATE_TO_HOME 1
+#define STATE_POST_BALL 2
+#define STATE_FINDING_LINE 3
 
 struct pid_t {
   int p_factor;
@@ -78,7 +80,7 @@ const int motor_pin_array[3][MOTOR_NUM] = {
   {PIN_DIR2_LEFT, PIN_DIR2_RIGHT}
 };
 
-int car_direction = DIRECTION_TO_TOWER;
+int car_direction = STATE_TO_TOWER;
 Servo myservo;
 
 void setup()
@@ -107,19 +109,66 @@ void process()
   // get the position
   // process with PID
   // get result
+  int i;
   
-  // ir 5
-  if (ir_array[2] == LOW) {
-    runForward(150, 200);
-  } else if (ir_array[1] == LOW) { 
-    runLeft(120, 2);
-  } else if (ir_array[3] == LOW) {
-    runRight(120, 2);
-  } else if (ir_array[0] == LOW) {
-    runLeft(150 ,2);
-  } else if (ir_array[4] == LOW) {
-    runRight(150, 2);
-  } else if (ir_array[0] == HIGH && ir_array[1] == HIGH && ir_array[2] == HIGH && ir_array[3] == HIGH && ir_array[4] == HIGH) {
+  if (collision_ir == LOW) {
+    if (car_direction == STATE_TO_TOWER) {
+      car_direction = STATE_FINDING_LINE;
+      stopDead(1000);
+      driveMotor();
+      delay(1000);
+      myservo.write(45);
+      delay(1000);
+      runLeft(180, 2);
+      for (i = 0; i < 6000; i++) {
+        driveMotor();
+      }
+    } else if (car_direction == STATE_TO_HOME) {
+      stopDead(1000);
+    }
+    return;
+  }
+  
+  if (car_direction == STATE_TO_TOWER) {
+    // ir 5
+    if (ir_array[0] == LOW && ir_array[2] == LOW) {
+      runLeft(150, 2);
+    } else if (ir_array[1] == LOW && ir_array[2] == LOW) {
+      runLeft(120, 2);
+    } else if (ir_array[2] == LOW) {
+      runForward(150, 2);
+    } else if (ir_array[1] == LOW) { 
+      runLeft(120, 2);
+    } else if (ir_array[3] == LOW) {
+      runRight(120, 2);
+    } else if (ir_array[0] == LOW) {
+      runLeft(150 ,2);
+    } else if (ir_array[4] == LOW) {
+      runRight(150, 2);
+    }
+  } else if (car_direction == STATE_TO_HOME) {
+    // ir 5
+    if (ir_array[4] == LOW && ir_array[2] == LOW) {
+      runRight(150, 2);
+    } else if (ir_array[3] == LOW && ir_array[2] == LOW) {
+      runRight(120, 2);
+    } else if (ir_array[2] == LOW) {
+      runForward(150, 2);
+    } else if (ir_array[1] == LOW) {
+      runLeft(120, 2);
+    } else if (ir_array[3] == LOW) {
+      runRight(120, 2);
+    } else if (ir_array[0] == LOW) {
+      runLeft(150 ,2);
+    } else if (ir_array[4] == LOW) {
+      runRight(150, 2);
+    }
+  } else if (car_direction == STATE_FINDING_LINE) {
+    if (ir_array[0] == HIGH && ir_array[1] == HIGH && ir_array[2] == HIGH && ir_array[3] == HIGH && ir_array[4] == HIGH) {
+      runLeft(120, 2);
+    } else {
+      car_direction = STATE_TO_HOME;
+    }
   }
 }
 
